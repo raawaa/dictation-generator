@@ -1,17 +1,33 @@
-name: Build Windows EXE
+name: Build and Release Windows EXE
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
+    tags:
+      - 'v*.*.*'  # 当推送版本标签时触发（如 v0.1.0）
+  workflow_dispatch:  # 允许手动触发
 
 jobs:
   build:
     runs-on: windows-latest
 
+    permissions:
+      contents: write  # 需要写入权限以创建 Release
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+
+    - name: Extract version from tag
+      id: get_version
+      run: |
+        if ("${{ github.ref }}" -like "refs/tags/*") {
+          $version = "${{ github.ref }}" -replace "refs/tags/", ""
+          echo "version=$version" >> $env:GITHUB_OUTPUT
+          echo "Version: $version"
+        } else {
+          echo "version=dev" >> $env:GITHUB_OUTPUT
+        }
+      shell: pwsh
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -27,9 +43,58 @@ jobs:
       run: |
         pyinstaller build.spec
 
+    - name: Rename EXE with version
+      id: rename
+      run: |
+        $version = "${{ steps.get_version.outputs.version }}"
+        if ($version -eq "dev") {
+          $version = "dev"
+        }
+        $oldName = Get-ChildItem -Path "dist" -Filter "*.exe" | Select-Object -FirstProperty Name
+        $newName = "dictation-generator-windows-$version.exe"
+        Rename-Item -Path "dist\$oldName" -NewName $newName
+        echo "exe_name=$newName" >> $env:GITHUB_OUTPUT
+        echo "Renamed to: $newName"
+      shell: pwsh
+
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: dictation-generator-windows
         path: dist/*.exe
         retention-days: 30
+
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')  # 仅在推送标签时创建 Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/*.exe
+        name: Release ${{ steps.get_version.outputs.version }}
+        body: |
+          ## 英语单词默写纸生成器 v${{ steps.get_version.outputs.version }}
+
+          ### 下载
+          - Windows 版本：`dictation-generator-windows-${{ steps.get_version.outputs.version }}.exe`
+
+          ### 功能特性
+          - 从 CSV 文件读取词汇数据
+          - 支持按单元、类型筛选
+          - 随机抽取指定数量词汇
+          - 生成 PDF 格式默写纸
+          - 图形化界面操作
+
+          ### 使用说明
+          1. 下载 EXE 文件
+          2. 双击运行
+          3. 选择 CSV 文件和配置参数
+          4. 点击生成按钮即可
+
+          ### 系统要求
+          - Windows 10 或更高版本
+
+          ### 更新日志
+          - 初始版本发布
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
