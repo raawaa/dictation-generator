@@ -193,8 +193,8 @@ class MainWindow(QMainWindow):
         self.units_layout = QHBoxLayout()
         data_layout.addLayout(self.units_layout)
 
-        # 单词类型
-        data_layout.addWidget(QLabel("单词类型:"))
+        # 默写类型
+        data_layout.addWidget(QLabel("默写类型:"))
         self.types_layout = QHBoxLayout()
         data_layout.addLayout(self.types_layout)
 
