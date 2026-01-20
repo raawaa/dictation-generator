@@ -15,7 +15,7 @@ def main():
     app.setStyle('Fusion')  # 使用Fusion风格
 
     window = MainWindow()
-    window.setWindowTitle('英语单词默写纸生成器 v2.0')
+    window.setWindowTitle('英语默写纸生成器')
     window.resize(800, 700)
     window.show()
 

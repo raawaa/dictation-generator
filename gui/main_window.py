@@ -271,6 +271,10 @@ class MainWindow(QMainWindow):
         """)
         self.generate_btn.clicked.connect(self.generate_dictation)
         button_layout.addWidget(self.generate_btn)
+
+        self.about_btn = QPushButton("关于")
+        self.about_btn.clicked.connect(self.show_about)
+        button_layout.addWidget(self.about_btn)
         scroll_layout.addLayout(button_layout)
 
         # ========== 进度显示 ==========
@@ -499,3 +503,15 @@ class MainWindow(QMainWindow):
         self.log_text.verticalScrollBar().setValue(
             self.log_text.verticalScrollBar().maximum()
         )
+
+    def show_about(self):
+        """显示关于对话框"""
+        about_text = """
+        <h2>英语默写纸生成器</h2>
+        <p><b>版本：</b>2.0</p>
+        <p><b>作者：</b>俞博衍教育</p>
+        <hr>
+        <p>从CSV文件中抽取英语单词、短语和句子，生成PDF格式的默写纸。</p>
+        <p>适用于小学生英语学习，采用标准英文练习本样式。</p>
+        """
+        QMessageBox.about(self, "关于", about_text)
