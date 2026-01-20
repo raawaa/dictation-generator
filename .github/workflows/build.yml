@@ -126,72 +126,61 @@ jobs:
         }
         
         # 生成变更日志
-        $changelog = @()
-        $changelog += "## 英语单词默写纸生成器 v$version"
-        $changelog += ""
-        $changelog += "### 下载"
-        $changelog += "- Windows 版本：`dictation-generator-windows-$version.exe`"
-        $changelog += ""
-        $changelog += "### 功能特性"
-        $changelog += "- 从 CSV 文件读取词汇数据"
-        $changelog += "- 支持按单元、类型筛选"
-        $changelog += "- 随机抽取指定数量词汇"
-        $changelog += "- 生成 PDF 格式默写纸"
-        $changelog += "- 图形化界面操作"
-        $changelog += ""
-        $changelog += "### 使用说明"
-        $changelog += "1. 下载 EXE 文件"
-        $changelog += "2. 双击运行"
-        $changelog += "3. 选择 CSV 文件和配置参数"
-        $changelog += "4. 点击生成按钮即可"
-        $changelog += ""
-        $changelog += "### 系统要求"
-        $changelog += "- Windows 10 或更高版本"
-        $changelog += ""
-        $changelog += "## 变更日志"
-        $changelog += ""
+        $releaseBody = ""
+        $releaseBody += "## 英语单词默写纸生成器 v$version`n`n"
+        $releaseBody += "### 下载`n"
+        $releaseBody += "- Windows 版本：`dictation-generator-windows-$version.exe``n`n"
+        $releaseBody += "### 功能特性`n"
+        $releaseBody += "- 从 CSV 文件读取词汇数据`n"
+        $releaseBody += "- 支持按单元、类型筛选`n"
+        $releaseBody += "- 随机抽取指定数量词汇`n"
+        $releaseBody += "- 生成 PDF 格式默写纸`n"
+        $releaseBody += "- 图形化界面操作`n`n"
+        $releaseBody += "### 使用说明`n"
+        $releaseBody += "1. 下载 EXE 文件`n"
+        $releaseBody += "2. 双击运行`n"
+        $releaseBody += "3. 选择 CSV 文件和配置参数`n"
+        $releaseBody += "4. 点击生成按钮即可`n`n"
+        $releaseBody += "### 系统要求`n"
+        $releaseBody += "- Windows 10 或更高版本`n`n"
+        $releaseBody += "## 变更日志`n`n"
         
         if ($features.Count -gt 0) {
-          $changelog += "### ✨ 新功能"
-          $changelog += ""
-          $features | ForEach-Object { $changelog += $_ }
-          $changelog += ""
+          $releaseBody += "### ✨ 新功能`n`n"
+          $features | ForEach-Object { $releaseBody += "$_`n" }
+          $releaseBody += "`n"
         }
         
         if ($fixes.Count -gt 0) {
-          $changelog += "### 🐛 问题修复"
-          $changelog += ""
-          $fixes | ForEach-Object { $changelog += $_ }
-          $changelog += ""
+          $releaseBody += "### 🐛 问题修复`n`n"
+          $fixes | ForEach-Object { $releaseBody += "$_`n" }
+          $releaseBody += "`n"
         }
         
         if ($docs.Count -gt 0) {
-          $changelog += "### 📝 文档更新"
-          $changelog += ""
-          $docs | ForEach-Object { $changelog += $_ }
-          $changelog += ""
+          $releaseBody += "### 📝 文档更新`n`n"
+          $docs | ForEach-Object { $releaseBody += "$_`n" }
+          $releaseBody += "`n"
         }
         
         if ($chores.Count -gt 0) {
-          $changelog += "### 🔧 构建/工具"
-          $changelog += ""
-          $chores | ForEach-Object { $changelog += $_ }
-          $changelog += ""
+          $releaseBody += "### 🔧 构建/工具`n`n"
+          $chores | ForEach-Object { $releaseBody += "$_`n" }
+          $releaseBody += "`n"
         }
         
         if ($others.Count -gt 0) {
-          $changelog += "### 其他"
-          $changelog += ""
-          $others | ForEach-Object { $changelog += $_ }
-          $changelog += ""
+          $releaseBody += "### 其他`n`n"
+          $others | ForEach-Object { $releaseBody += "$_`n" }
+          $releaseBody += "`n"
         }
         
         if ($features.Count -eq 0 -and $fixes.Count -eq 0 -and $docs.Count -eq 0 -and $chores.Count -eq 0 -and $others.Count -eq 0) {
-          $changelog += "无变更记录"
+          $releaseBody += "无变更记录`n"
         }
         
         # 将变更日志保存到文件
-        $changelog | Out-File -FilePath "release_body.txt" -Encoding UTF8
+        $releaseBody | Out-File -FilePath "release_body.txt" -Encoding UTF8 -NoNewline
         
         # 输出前几行用于调试
         Get-Content "release_body.txt" | Select-Object -First 20
