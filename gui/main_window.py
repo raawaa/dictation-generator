@@ -20,6 +20,7 @@ from PyQt6.QtCore import QThread, pyqtSignal, Qt
 from PyQt6.QtGui import QFont
 
 from core.generator import DictationGenerator
+from gui import __version__, __author__, __description__
 
 
 class GenerateThread(QThread):
@@ -552,10 +553,10 @@ class MainWindow(QMainWindow):
 
     def show_about(self):
         """显示关于对话框"""
-        about_text = """
-        <h2>英语默写纸生成器</h2>
-        <p><b>版本：</b>2.0</p>
-        <p><b>作者：</b>俞博衍教育</p>
+        about_text = f"""
+        <h2>{__description__}</h2>
+        <p><b>版本：</b>{__version__}</p>
+        <p><b>作者：</b>{__author__}</p>
         <hr>
         <p>从CSV文件中抽取英语单词、短语和句子，生成PDF格式的默写纸。</p>
         <p>适用于小学生英语学习，采用标准英文练习本样式。</p>

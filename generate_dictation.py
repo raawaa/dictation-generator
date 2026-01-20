@@ -18,6 +18,8 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.enums import TA_LEFT, TA_CENTER
+
+from __version__ import __version__, __author__, __description__
 from reportlab.lib import colors
 
 
@@ -483,6 +485,8 @@ def main():
                         help='单词类型，可用逗号分隔多个类型（默认：全部）')
     parser.add_argument('--output-dir', type=str, default='.',
                         help='输出目录（默认：当前目录）')
+    parser.add_argument('--version', action='version',
+                        version=f'{__description__} {__version__}')
 
     args = parser.parse_args()
 

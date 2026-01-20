@@ -1,5 +1,10 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+# 导入版本号
+import sys
+sys.path.insert(0, '.')
+from __version__ import __version__
+
 block_cipher = None
 
 a = Analysis(
@@ -56,6 +61,7 @@ exe = EXE(
     a.datas,
     [],
     name='英语单词默写纸生成器',
+    version=__version__,
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
