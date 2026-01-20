@@ -9,6 +9,6 @@
 - PATCH: 向下兼容的问题修正
 """
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 __author__ = "raawaa"
 __description__ = "英语单词默写纸生成器"
