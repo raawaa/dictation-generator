@@ -1,0 +1,10 @@
+name: dictation-generator
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+    - reportlab>=4.4.0
+    - PyQt6>=6.6.0
+    - pyinstaller>=6.0.0
