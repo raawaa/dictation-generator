@@ -50,7 +50,7 @@ jobs:
         if ($version -eq "dev") {
           $version = "dev"
         }
-        $oldName = Get-ChildItem -Path "dist" -Filter "*.exe" | Select-Object -FirstProperty Name
+        $oldName = Get-ChildItem -Path "dist" -Filter "*.exe" | Select-Object -First 1 -ExpandProperty Name
         $newName = "dictation-generator-windows-$version.exe"
         Rename-Item -Path "dist\$oldName" -NewName $newName
         echo "exe_name=$newName" >> $env:GITHUB_OUTPUT
