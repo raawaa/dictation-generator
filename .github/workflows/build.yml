@@ -127,10 +127,10 @@ jobs:
         
         # 生成变更日志
         $changelog = @()
-        $changelog += "## 英语单词默写纸生成器 v${{ steps.get_version.outputs.version }}"
+        $changelog += "## 英语单词默写纸生成器 v$version"
         $changelog += ""
         $changelog += "### 下载"
-        $changelog += "- Windows 版本：`dictation-generator-windows-${{ steps.get_version.outputs.version }}.exe`"
+        $changelog += "- Windows 版本：`dictation-generator-windows-$version.exe`"
         $changelog += ""
         $changelog += "### 功能特性"
         $changelog += "- 从 CSV 文件读取词汇数据"
