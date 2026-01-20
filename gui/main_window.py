@@ -159,7 +159,7 @@ class MainWindow(QMainWindow):
         self.load_default_data()
 
     def init_ui(self):
-        self.setWindowTitle("英语单词默写纸生成器 v2.0")
+        self.setWindowTitle("英语默写纸生成器")
         self.setMinimumSize(800, 700)
 
         # 主窗口部件
