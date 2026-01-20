@@ -64,36 +64,146 @@ jobs:
         path: dist/*.exe
         retention-days: 30
 
+    - name: Generate Changelog
+      id: changelog
+      run: |
+        $version = "${{ steps.get_version.outputs.version }}"
+        echo "Generating changelog for version $version"
+        
+        # 获取上一个版本标签
+        $prevTag = $(git describe --tags --abbrev=0 HEAD^ 2>$null)
+        if ($LASTEXITCODE -ne 0) {
+          $prevTag = ""
+        }
+        echo "Previous tag: $prevTag"
+        
+        # 获取自上一个版本以来的提交
+        if ($prevTag) {
+          $commits = git log $prevTag..HEAD --pretty=format:"%h|%s|%an|%ad" --date=short
+        } else {
+          $commits = git log --pretty=format:"%h|%s|%an|%ad" --date=short
+        }
+        
+        # 解析提交信息并分类
+        $features = @()
+        $fixes = @()
+        $docs = @()
+        $chores = @()
+        $others = @()
+        
+        foreach ($commit in $commits) {
+          if ($commit -match '^(.+)\|(.+)\|(.+)\|(.+)$') {
+            $hash = $matches[1]
+            $message = $matches[2]
+            $author = $matches[3]
+            $date = $matches[4]
+            
+            # 解析 Conventional Commits 格式
+            if ($message -match '^(feat|fix|docs|chore|refactor|style|test|build|ci|perf|revert)(\(.+\))?:\s*(.+)') {
+              $type = $matches[1]
+              $scope = $matches[2]
+              $desc = $matches[3]
+              
+              $entry = "- $desc ($hash)"
+              
+              switch ($type) {
+                'feat' { $features += $entry }
+                'fix' { $fixes += $entry }
+                'docs' { $docs += $entry }
+                'chore' { $chores += $entry }
+                'refactor' { $others += $entry }
+                'style' { $others += $entry }
+                'test' { $others += $entry }
+                'build' { $others += $entry }
+                'ci' { $others += $entry }
+                'perf' { $others += $entry }
+                'revert' { $others += $entry }
+              }
+            } else {
+              $others += "- $message ($hash)"
+            }
+          }
+        }
+        
+        # 生成变更日志
+        $changelog = @()
+        $changelog += "## 英语单词默写纸生成器 v${{ steps.get_version.outputs.version }}"
+        $changelog += ""
+        $changelog += "### 下载"
+        $changelog += "- Windows 版本：`dictation-generator-windows-${{ steps.get_version.outputs.version }}.exe`"
+        $changelog += ""
+        $changelog += "### 功能特性"
+        $changelog += "- 从 CSV 文件读取词汇数据"
+        $changelog += "- 支持按单元、类型筛选"
+        $changelog += "- 随机抽取指定数量词汇"
+        $changelog += "- 生成 PDF 格式默写纸"
+        $changelog += "- 图形化界面操作"
+        $changelog += ""
+        $changelog += "### 使用说明"
+        $changelog += "1. 下载 EXE 文件"
+        $changelog += "2. 双击运行"
+        $changelog += "3. 选择 CSV 文件和配置参数"
+        $changelog += "4. 点击生成按钮即可"
+        $changelog += ""
+        $changelog += "### 系统要求"
+        $changelog += "- Windows 10 或更高版本"
+        $changelog += ""
+        $changelog += "## 变更日志"
+        $changelog += ""
+        
+        if ($features.Count -gt 0) {
+          $changelog += "### ✨ 新功能"
+          $changelog += ""
+          $features | ForEach-Object { $changelog += $_ }
+          $changelog += ""
+        }
+        
+        if ($fixes.Count -gt 0) {
+          $changelog += "### 🐛 问题修复"
+          $changelog += ""
+          $fixes | ForEach-Object { $changelog += $_ }
+          $changelog += ""
+        }
+        
+        if ($docs.Count -gt 0) {
+          $changelog += "### 📝 文档更新"
+          $changelog += ""
+          $docs | ForEach-Object { $changelog += $_ }
+          $changelog += ""
+        }
+        
+        if ($chores.Count -gt 0) {
+          $changelog += "### 🔧 构建/工具"
+          $changelog += ""
+          $chores | ForEach-Object { $changelog += $_ }
+          $changelog += ""
+        }
+        
+        if ($others.Count -gt 0) {
+          $changelog += "### 其他"
+          $changelog += ""
+          $others | ForEach-Object { $changelog += $_ }
+          $changelog += ""
+        }
+        
+        if ($features.Count -eq 0 -and $fixes.Count -eq 0 -and $docs.Count -eq 0 -and $chores.Count -eq 0 -and $others.Count -eq 0) {
+          $changelog += "无变更记录"
+        }
+        
+        # 将变更日志保存到文件
+        $changelog | Out-File -FilePath "release_body.txt" -Encoding UTF8
+        
+        # 输出前几行用于调试
+        Get-Content "release_body.txt" | Select-Object -First 20
+      shell: pwsh
+
     - name: Create Release
       if: startsWith(github.ref, 'refs/tags/')  # 仅在推送标签时创建 Release
       uses: softprops/action-gh-release@v1
       with:
         files: dist/*.exe
         name: Release ${{ steps.get_version.outputs.version }}
-        body: |
-          ## 英语单词默写纸生成器 v${{ steps.get_version.outputs.version }}
-
-          ### 下载
-          - Windows 版本：`dictation-generator-windows-${{ steps.get_version.outputs.version }}.exe`
-
-          ### 功能特性
-          - 从 CSV 文件读取词汇数据
-          - 支持按单元、类型筛选
-          - 随机抽取指定数量词汇
-          - 生成 PDF 格式默写纸
-          - 图形化界面操作
-
-          ### 使用说明
-          1. 下载 EXE 文件
-          2. 双击运行
-          3. 选择 CSV 文件和配置参数
-          4. 点击生成按钮即可
-
-          ### 系统要求
-          - Windows 10 或更高版本
-
-          ### 更新日志
-          - 初始版本发布
+        body_path: release_body.txt
         draft: false
         prerelease: false
       env:
