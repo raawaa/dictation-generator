@@ -127,27 +127,6 @@ jobs:
         
         # 生成变更日志
         $releaseBody = @()
-        $releaseBody += "## 英语单词默写纸生成器 v$version"
-        $releaseBody += ""
-        $releaseBody += "### 下载"
-        $releaseBody += "- Windows 版本：`dictation-generator-windows-$version.exe`"
-        $releaseBody += ""
-        $releaseBody += "### 功能特性"
-        $releaseBody += "- 从 CSV 文件读取词汇数据"
-        $releaseBody += "- 支持按单元、类型筛选"
-        $releaseBody += "- 随机抽取指定数量词汇"
-        $releaseBody += "- 生成 PDF 格式默写纸"
-        $releaseBody += "- 图形化界面操作"
-        $releaseBody += ""
-        $releaseBody += "### 使用说明"
-        $releaseBody += "1. 下载 EXE 文件"
-        $releaseBody += "2. 双击运行"
-        $releaseBody += "3. 选择 CSV 文件和配置参数"
-        $releaseBody += "4. 点击生成按钮即可"
-        $releaseBody += ""
-        $releaseBody += "### 系统要求"
-        $releaseBody += "- Windows 10 或更高版本"
-        $releaseBody += ""
         $releaseBody += "## 变更日志"
         $releaseBody += ""
         
