@@ -21,7 +21,7 @@ jobs:
       id: get_version
       run: |
         if ("${{ github.ref }}" -like "refs/tags/*") {
-          $version = "${{ github.ref }}" -replace "refs/tags/", ""
+          $version = "${{ github.ref }}" -replace "refs/tags/", "" -replace "^v", ""
           echo "version=$version" >> $env:GITHUB_OUTPUT
           echo "Version: $version"
         } else {
@@ -126,61 +126,72 @@ jobs:
         }
         
         # 生成变更日志
-        $releaseBody = ""
-        $releaseBody += "## 英语单词默写纸生成器 v$version`n`n"
-        $releaseBody += "### 下载`n"
-        $releaseBody += "- Windows 版本：`dictation-generator-windows-$version.exe``n`n"
-        $releaseBody += "### 功能特性`n"
-        $releaseBody += "- 从 CSV 文件读取词汇数据`n"
-        $releaseBody += "- 支持按单元、类型筛选`n"
-        $releaseBody += "- 随机抽取指定数量词汇`n"
-        $releaseBody += "- 生成 PDF 格式默写纸`n"
-        $releaseBody += "- 图形化界面操作`n`n"
-        $releaseBody += "### 使用说明`n"
-        $releaseBody += "1. 下载 EXE 文件`n"
-        $releaseBody += "2. 双击运行`n"
-        $releaseBody += "3. 选择 CSV 文件和配置参数`n"
-        $releaseBody += "4. 点击生成按钮即可`n`n"
-        $releaseBody += "### 系统要求`n"
-        $releaseBody += "- Windows 10 或更高版本`n`n"
-        $releaseBody += "## 变更日志`n`n"
+        $releaseBody = @()
+        $releaseBody += "## 英语单词默写纸生成器 v$version"
+        $releaseBody += ""
+        $releaseBody += "### 下载"
+        $releaseBody += "- Windows 版本：`dictation-generator-windows-$version.exe`"
+        $releaseBody += ""
+        $releaseBody += "### 功能特性"
+        $releaseBody += "- 从 CSV 文件读取词汇数据"
+        $releaseBody += "- 支持按单元、类型筛选"
+        $releaseBody += "- 随机抽取指定数量词汇"
+        $releaseBody += "- 生成 PDF 格式默写纸"
+        $releaseBody += "- 图形化界面操作"
+        $releaseBody += ""
+        $releaseBody += "### 使用说明"
+        $releaseBody += "1. 下载 EXE 文件"
+        $releaseBody += "2. 双击运行"
+        $releaseBody += "3. 选择 CSV 文件和配置参数"
+        $releaseBody += "4. 点击生成按钮即可"
+        $releaseBody += ""
+        $releaseBody += "### 系统要求"
+        $releaseBody += "- Windows 10 或更高版本"
+        $releaseBody += ""
+        $releaseBody += "## 变更日志"
+        $releaseBody += ""
         
         if ($features.Count -gt 0) {
-          $releaseBody += "### ✨ 新功能`n`n"
-          $features | ForEach-Object { $releaseBody += "$_`n" }
-          $releaseBody += "`n"
+          $releaseBody += "### ✨ 新功能"
+          $releaseBody += ""
+          $features | ForEach-Object { $releaseBody += $_ }
+          $releaseBody += ""
         }
         
         if ($fixes.Count -gt 0) {
-          $releaseBody += "### 🐛 问题修复`n`n"
-          $fixes | ForEach-Object { $releaseBody += "$_`n" }
-          $releaseBody += "`n"
+          $releaseBody += "### 🐛 问题修复"
+          $releaseBody += ""
+          $fixes | ForEach-Object { $releaseBody += $_ }
+          $releaseBody += ""
         }
         
         if ($docs.Count -gt 0) {
-          $releaseBody += "### 📝 文档更新`n`n"
-          $docs | ForEach-Object { $releaseBody += "$_`n" }
-          $releaseBody += "`n"
+          $releaseBody += "### 📝 文档更新"
+          $releaseBody += ""
+          $docs | ForEach-Object { $releaseBody += $_ }
+          $releaseBody += ""
         }
         
         if ($chores.Count -gt 0) {
-          $releaseBody += "### 🔧 构建/工具`n`n"
-          $chores | ForEach-Object { $releaseBody += "$_`n" }
-          $releaseBody += "`n"
+          $releaseBody += "### 🔧 构建/工具"
+          $releaseBody += ""
+          $chores | ForEach-Object { $releaseBody += $_ }
+          $releaseBody += ""
         }
         
         if ($others.Count -gt 0) {
-          $releaseBody += "### 其他`n`n"
-          $others | ForEach-Object { $releaseBody += "$_`n" }
-          $releaseBody += "`n"
+          $releaseBody += "### 其他"
+          $releaseBody += ""
+          $others | ForEach-Object { $releaseBody += $_ }
+          $releaseBody += ""
         }
         
         if ($features.Count -eq 0 -and $fixes.Count -eq 0 -and $docs.Count -eq 0 -and $chores.Count -eq 0 -and $others.Count -eq 0) {
-          $releaseBody += "无变更记录`n"
+          $releaseBody += "无变更记录"
         }
         
-        # 将变更日志保存到文件
-        $releaseBody | Out-File -FilePath "release_body.txt" -Encoding UTF8 -NoNewline
+        # 将变更日志保存到文件，使用换行符连接
+        $releaseBody -join "`n" | Out-File -FilePath "release_body.txt" -Encoding UTF8
         
         # 输出前几行用于调试
         Get-Content "release_body.txt" | Select-Object -First 20
