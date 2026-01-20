@@ -154,6 +154,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.generator: Optional[DictationGenerator] = None
         self.unit_checkboxes: List[QCheckBox] = []
+        self.grade_checkboxes: List[QCheckBox] = []
         self.type_checkboxes: List[QCheckBox] = []
         self.generate_thread: Optional[GenerateThread] = None
         self.init_ui()
@@ -196,6 +197,11 @@ class MainWindow(QMainWindow):
         csv_browse_btn.clicked.connect(self.browse_csv_file)
         csv_layout.addWidget(csv_browse_btn)
         data_layout.addLayout(csv_layout)
+
+        # 年级选择
+        data_layout.addWidget(QLabel("年级选择:"))
+        self.grades_layout = QHBoxLayout()
+        data_layout.addLayout(self.grades_layout)
 
         # 单元选择
         data_layout.addWidget(QLabel("可用单元:"))
@@ -336,19 +342,27 @@ class MainWindow(QMainWindow):
             self.generator = DictationGenerator(str(csv_path))
             self.generator.load_vocabulary()
 
+            # 清除旧的年级复选框
+            for checkbox in self.grade_checkboxes:
+                checkbox.deleteLater()
+            self.grade_checkboxes.clear()
+
+            # 创建新的年级复选框
+            grades = self.generator.get_available_grades()
+            for grade in grades:
+                checkbox = QCheckBox(grade)
+                checkbox.setChecked(True)
+                checkbox.stateChanged.connect(self.on_grade_changed)
+                self.grade_checkboxes.append(checkbox)
+                self.grades_layout.addWidget(checkbox)
+
             # 清除旧的单元复选框
             for checkbox in self.unit_checkboxes:
                 checkbox.deleteLater()
             self.unit_checkboxes.clear()
 
-            # 创建新的单元复选框
-            units = self.generator.get_available_units()
-            for unit in units:
-                checkbox = QCheckBox(unit)
-                if unit == "M1":
-                    checkbox.setChecked(True)
-                self.unit_checkboxes.append(checkbox)
-                self.units_layout.addWidget(checkbox)
+            # 创建新的单元复选框（基于选中的年级）
+            self.update_unit_checkboxes()
 
             # 清除旧的类型复选框
             for checkbox in self.type_checkboxes:
@@ -367,6 +381,33 @@ class MainWindow(QMainWindow):
         except Exception as e:
             QMessageBox.critical(self, "错误", f"加载CSV文件失败：{str(e)}")
             self.log(f"✗ 加载CSV文件失败：{str(e)}")
+
+    def on_grade_changed(self):
+        """年级选择变化时更新单元列表"""
+        self.update_unit_checkboxes()
+
+    def update_unit_checkboxes(self):
+        """根据选中的年级更新单元复选框"""
+        # 获取选中的年级
+        selected_grades = [cb.text() for cb in self.grade_checkboxes if cb.isChecked()]
+
+        # 获取选中年级的所有单元
+        available_units = set()
+        for grade in selected_grades:
+            units = self.generator.get_units_by_grade(grade)
+            available_units.update(units)
+
+        # 清除旧的单元复选框
+        for checkbox in self.unit_checkboxes:
+            checkbox.deleteLater()
+        self.unit_checkboxes.clear()
+
+        # 创建新的单元复选框
+        for unit in sorted(available_units):
+            checkbox = QCheckBox(unit)
+            checkbox.setChecked(True)
+            self.unit_checkboxes.append(checkbox)
+            self.units_layout.addWidget(checkbox)
 
     def browse_csv_file(self):
         """浏览CSV文件"""

@@ -166,6 +166,32 @@ class DictationGenerator:
         """获取所有可用的单元"""
         return sorted(self.unit_dict.keys())
 
+    def get_available_grades(self) -> List[str]:
+        """获取所有可用的年级"""
+        grades = set()
+        for word in self.vocabulary:
+            grades.add(word['grade'])
+        return sorted(grades)
+
+    def get_units_by_grade(self, grade: str) -> List[str]:
+        """获取指定年级的所有单元"""
+        units = set()
+        for word in self.vocabulary:
+            if word['grade'] == grade:
+                units.add(word['unit'])
+        return sorted(units)
+
+    def get_grade_unit_mapping(self) -> Dict[str, List[str]]:
+        """获取年级-单元映射关系"""
+        mapping = {}
+        for word in self.vocabulary:
+            grade = word['grade']
+            unit = word['unit']
+            if grade not in mapping:
+                mapping[grade] = set()
+            mapping[grade].add(unit)
+        return {k: sorted(v) for k, v in mapping.items()}
+
     def get_word_count_by_unit(self, unit: str, word_type: Optional[str] = None) -> int:
         """
         获取指定单元的单词数量
