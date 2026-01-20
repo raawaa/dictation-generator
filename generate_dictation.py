@@ -469,8 +469,8 @@ class DictationGenerator:
 
 def main():
     parser = argparse.ArgumentParser(description='英语单词默写纸生成器')
-    parser.add_argument('--csv', type=str, default='校内英语单词.csv',
-                        help='CSV文件路径（默认：校内英语单词.csv）')
+    parser.add_argument('--csv', type=str, default='data/校内英语单词.csv',
+                        help='CSV文件路径（默认：data/校内英语单词.csv）')
     parser.add_argument('--unit', type=str, default='M1',
                         help='单元名称，如 M1, M2（默认：M1）')
     parser.add_argument('--units', type=str,

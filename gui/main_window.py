@@ -25,7 +25,7 @@ class GenerateThread(QThread):
     """生成线程，用于异步生成PDF"""
 
     progress_signal = pyqtSignal(str)
-    finished_signal = pyqtSignal(bool, str, List[str])
+    finished_signal = pyqtSignal(bool, str, object)
 
     def __init__(self, generator: DictationGenerator, units: List[str],
                  count: Optional[int], copies: int, word_types: List[str],
