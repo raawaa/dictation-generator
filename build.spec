@@ -61,7 +61,6 @@ exe = EXE(
     a.datas,
     [],
     name='英语单词默写纸生成器',
-    version=__version__,
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
