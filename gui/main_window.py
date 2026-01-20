@@ -13,7 +13,8 @@ from typing import List, Optional
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
     QLineEdit, QCheckBox, QSpinBox, QProgressBar, QTextEdit, QFileDialog,
-    QMessageBox, QDialog, QDialogButtonBox, QGroupBox, QScrollArea, QFrame
+    QMessageBox, QDialog, QDialogButtonBox, QGroupBox, QScrollArea, QFrame,
+    QMenuBar, QMenu
 )
 from PyQt6.QtCore import QThread, pyqtSignal, Qt
 from PyQt6.QtGui import QFont
@@ -162,6 +163,14 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("英语默写纸生成器")
         self.setMinimumSize(800, 700)
 
+        # 创建菜单栏
+        menubar = self.menuBar()
+        
+        # 帮助菜单
+        help_menu = menubar.addMenu("帮助(&H)")
+        about_action = help_menu.addAction("关于(&A)")
+        about_action.triggered.connect(self.show_about)
+
         # 主窗口部件
         widget = QWidget()
         self.setCentralWidget(widget)
@@ -271,10 +280,6 @@ class MainWindow(QMainWindow):
         """)
         self.generate_btn.clicked.connect(self.generate_dictation)
         button_layout.addWidget(self.generate_btn)
-
-        self.about_btn = QPushButton("关于")
-        self.about_btn.clicked.connect(self.show_about)
-        button_layout.addWidget(self.about_btn)
         scroll_layout.addLayout(button_layout)
 
         # ========== 进度显示 ==========
